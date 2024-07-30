@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TROVA IL TUO TAVOLO</title>
+  <style>
+    body {
+      font-family: Apple Chancery; /* Change this to any web-safe font you prefer */
+      background-color: beige
+    }
+    #map {
+      display: grid;
+      grid-template-columns: repeat(4, 90px);
+      gap: 6px;
+      margin-top: 20px;
+    }
+    .table {
+      width: 90px;
+      height: 80px;
+      border: 1px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .highlight {
+      background-color: lightblue;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>TROVA IL TUO TAVOLO</h1>
+  <input type="text" id="nameInput" placeholder="SCRIVI IL TUO NOME">
+  <button onclick="searchTable()">CERCA</button>
+  <div id="message"></div>
+  <div id="map"></div>
+
+  <script>
+    const mapElement = document.getElementById('map');
+    const messageElement = document.getElementById('message');
+
+
+    const tableNames = ['ibiza', 'ari', 'procida', 'sicilia', 'hawaii', 'isole tremiti', 'corsica', 'bali', 'santorini', 'madaga- scar', 'yakushima', 'haiti', 'capri', 'creta', 'mauritius', 'fiji', 'mahe’', 'ischia', 'sant’elena', 'palawan', 'skye', 'isola di pasqua', 'lofoten', 'zanzibar', 'sardegna', 'bora bora', 'cipro', 'murano'];
+
+function capitalize(str) {
+      return str.toUpperCase();
+    }
+
+    function createMap() {
+      tableNames.forEach((name) => {
+        const table = document.createElement('div');
+        table.className = 'table';
+        table.id = `table-${name}`;
+        table.innerText = capitalize(name);
+        mapElement.appendChild(table);
+      });
+    }
+
+    function searchTable() {
+      const name = document.getElementById('nameInput').value.trim();
+      fetch(`/search?name=${encodeURIComponent(name)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            highlightTable(data.table);
+            showMessage(`SEI AL TAVOLO: ${capitalize(data.table)}`);
+          } else {
+            clearHighlights();
+            showMessage(data.message);
+          }
+        });
+    }
+
+    function highlightTable(tableName) {
+      const tables = document.querySelectorAll('.table');
+      tables.forEach(table => table.classList.remove('highlight'));
+
+      const tableToHighlight = document.getElementById(`table-${tableName}`);
+      if (tableToHighlight) {
+        tableToHighlight.classList.add('highlight');
+      }
+    }
+
+    function clearHighlights() {
+      const tables = document.querySelectorAll('.table');
+      tables.forEach(table => table.classList.remove('highlight'));
+    }
+
+    function showMessage(message) {
+      messageElement.innerText = message;
+    }
+
+    createMap();
+  </script>
+</body>
+</html>
